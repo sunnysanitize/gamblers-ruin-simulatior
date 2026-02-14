@@ -1,19 +1,22 @@
 # Gambler's Ruin Simulation
 
-## Run the browser app (recommended)
+## Run with Flask dashboard (recommended)
 
 ```bash
 cd /Users/ricedevice/gamblers-ruin-simulation
 python3 -m pip install -r requirements.txt
-streamlit run app.py
+python3 gamblersruin.py --trials 10000 --paths 30
 ```
 
-Streamlit will print a local URL (usually `http://localhost:8501`) and open it in your browser.
+This will:
+- generate `gamblers_ruin_dashboard.html`
+- start a Flask server at `http://127.0.0.1:5000`
+- open your browser automatically
 
-## Run CLI mode
+## Useful options
 
 ```bash
-python3 gamblersruin.py --trials 10000 --paths 30 --open-browser
+python3 gamblersruin.py --no-open-browser
+python3 gamblersruin.py --host 127.0.0.1 --port 5050
+python3 gamblersruin.py --no-serve
 ```
-
-This generates `gamblers_ruin_dashboard.html`.

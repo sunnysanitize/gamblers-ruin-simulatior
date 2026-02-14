@@ -17,15 +17,32 @@ def parse_args() -> argparse.Namespace:
         help="How many full bankroll paths to draw in the dashboard",
     )
     parser.add_argument(
-        "--open-browser",
+        "--no-open-browser",
         action="store_true",
-        help="Open the dashboard in your default browser after generation",
+        help="Do not open the dashboard in your default browser after generation",
     )
     parser.add_argument(
         "--output",
         type=Path,
         default=Path("gamblers_ruin_dashboard.html"),
         help="Output HTML dashboard path",
+    )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="Host for the Flask dashboard server",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port for the Flask dashboard server",
+    )
+    parser.add_argument(
+        "--no-serve",
+        action="store_true",
+        help="Do not start the Flask dashboard server",
     )
     return parser.parse_args()
 
@@ -41,3 +58,5 @@ def validate_args(args: argparse.Namespace) -> None:
         raise SystemExit("--trials must be > 0")
     if args.paths < 0:
         raise SystemExit("--paths cannot be negative")
+    if args.port <= 0 or args.port > 65535:
+        raise SystemExit("--port must be between 1 and 65535")
