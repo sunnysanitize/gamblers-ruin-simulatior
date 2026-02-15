@@ -6,15 +6,21 @@ from pathlib import Path
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Interactive Gambler's Ruin simulator")
-    parser.add_argument("--start", type=int, default=500, help="Starting bankroll")
-    parser.add_argument("--goal", type=int, default=1000, help="Goal bankroll")
+    parser.add_argument("--start", type=int, default=25, help="Starting bankroll")
+    parser.add_argument("--goal", type=int, default=50, help="Goal bankroll")
     parser.add_argument("--p", type=float, default=0.5, help="Probability of winning each round")
-    parser.add_argument("--trials", type=int, default=10000, help="Number of Monte Carlo trials")
+    parser.add_argument("--trials", type=int, default=20000, help="Number of Monte Carlo trials (max 100000)")
     parser.add_argument(
         "--paths",
         type=int,
-        default=30,
+        default=20,
         help="How many full bankroll paths to draw in the dashboard",
+    )
+    parser.add_argument(
+        "--target-goals",
+        type=str,
+        default="",
+        help="Comma-separated goals for configuration comparison in Flask dashboard (e.g., 40,50,60)",
     )
     parser.add_argument(
         "--no-open-browser",
@@ -56,6 +62,8 @@ def validate_args(args: argparse.Namespace) -> None:
         raise SystemExit("--p must be between 0 and 1")
     if args.trials <= 0:
         raise SystemExit("--trials must be > 0")
+    if args.trials > 100000:
+        raise SystemExit("--trials must be <= 100000")
     if args.paths < 0:
         raise SystemExit("--paths cannot be negative")
     if args.port <= 0 or args.port > 65535:
