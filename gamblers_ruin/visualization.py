@@ -60,6 +60,7 @@ def build_figure(
                 y=path,
                 mode="lines",
                 name=f"Path {i}",
+                showlegend=False,
                 opacity=0.85,
                 line=dict(width=2),
             ),
@@ -182,7 +183,8 @@ def build_figure(
         template="plotly_white",
         height=1100,
         bargap=0.05,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+        margin=dict(t=140, b=120, l=60, r=40),
+        legend=dict(orientation="h", yanchor="top", y=-0.08, xanchor="left", x=0),
     )
 
     fig.update_xaxes(title_text="Step", row=1, col=1)

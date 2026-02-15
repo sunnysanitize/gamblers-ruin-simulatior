@@ -21,23 +21,112 @@ PAGE_TEMPLATE = """
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gambler's Ruin Simulator</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 1.5rem; color: #121212; background: #f8fafc; }
-    h1 { margin: 0 0 0.25rem 0; }
-    .sub { margin: 0 0 1rem 0; color: #425466; }
-    form { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; background: #fff; padding: 1rem; border-radius: 10px; }
-    label { display: flex; flex-direction: column; font-size: 0.85rem; color: #3a4451; }
-    input { margin-top: 0.25rem; padding: 0.45rem; border: 1px solid #d9dee5; border-radius: 8px; }
-    button { grid-column: 1 / -1; padding: 0.6rem; border-radius: 8px; border: 0; background: #0f6bff; color: #fff; font-weight: 600; cursor: pointer; }
+    :root {
+      --bg: #f8fafc;
+      --fg: #121212;
+      --muted: #425466;
+      --panel: #ffffff;
+      --line: #e7ebf0;
+      --accent: #0f6bff;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      color: var(--fg);
+      background: var(--bg);
+    }
+    .shell {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    h1 { margin: 0 0 0.25rem 0; font-size: clamp(1.35rem, 3.5vw, 2rem); line-height: 1.2; }
+    .sub { margin: 0 0 1rem 0; color: var(--muted); font-size: 0.95rem; }
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      background: var(--panel);
+      padding: 0.9rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+    label { display: flex; flex-direction: column; font-size: 0.85rem; color: #3a4451; min-width: 0; }
+    input {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.55rem 0.6rem;
+      border: 1px solid #d9dee5;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      min-width: 0;
+    }
+    button {
+      grid-column: 1 / -1;
+      padding: 0.7rem;
+      border-radius: 8px;
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
     .error { background: #ffe3e3; color: #7d1a1a; padding: 0.65rem; border-radius: 8px; margin-bottom: 1rem; }
-    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
-    .card { background: #fff; padding: 0.75rem; border-radius: 10px; border: 1px solid #e7ebf0; }
-    .card b { display: block; font-size: 1.2rem; margin-top: 0.2rem; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; background: #fff; border-radius: 10px; overflow: hidden; }
-    th, td { padding: 0.6rem; border-bottom: 1px solid #ecf0f4; text-align: left; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .card {
+      background: var(--panel);
+      padding: 0.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      min-width: 0;
+    }
+    .card b { display: block; font-size: clamp(1rem, 3vw, 1.2rem); margin-top: 0.2rem; word-break: break-word; }
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+    table { width: 100%; min-width: 520px; border-collapse: collapse; }
+    th, td { padding: 0.6rem; border-bottom: 1px solid #ecf0f4; text-align: left; white-space: nowrap; }
     th { background: #f2f6fc; font-weight: 600; }
+    .figure-wrap {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0.4rem;
+      overflow: hidden;
+    }
+    .figure-wrap .plotly-graph-div {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    @media (max-width: 700px) {
+      .shell { padding: 0.75rem; }
+      form { grid-template-columns: 1fr; gap: 0.65rem; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      table { min-width: 460px; }
+    }
+    @media (max-width: 460px) {
+      .metrics { grid-template-columns: 1fr; }
+      .sub { font-size: 0.9rem; }
+    }
   </style>
 </head>
 <body>
+  <div class="shell">
   <h1>Gambler's Ruin Simulation</h1>
   <p class="sub">Monte Carlo vs closed-form theory, convergence diagnostics, and variance decay.</p>
 
@@ -74,6 +163,7 @@ PAGE_TEMPLATE = """
       <div class="card">Absolute error<b>{{ metrics.error }}</b></div>
       <div class="card">Trials<b>{{ metrics.trials }}</b></div>
     </div>
+    <div class="table-wrap">
     <table>
       <thead>
         <tr><th>Goal</th><th>Empirical</th><th>Closed-form</th><th>Absolute Error</th></tr>
@@ -89,8 +179,24 @@ PAGE_TEMPLATE = """
         {% endfor %}
       </tbody>
     </table>
-    {{ figure_html|safe }}
+    </div>
+    <div class="figure-wrap">{{ figure_html|safe }}</div>
   {% endif %}
+  </div>
+  <script>
+    (function () {
+      function fitPlotlyHeight() {
+        var graph = document.querySelector(".figure-wrap .plotly-graph-div");
+        if (!graph || typeof Plotly === "undefined") return;
+        var isMobile = window.matchMedia("(max-width: 700px)").matches;
+        var targetHeight = isMobile ? 1450 : 1100;
+        Plotly.relayout(graph, {height: targetHeight});
+      }
+      window.addEventListener("resize", fitPlotlyHeight);
+      window.addEventListener("load", fitPlotlyHeight);
+      setTimeout(fitPlotlyHeight, 250);
+    })();
+  </script>
 </body>
 </html>
 """
@@ -267,7 +373,12 @@ def serve_dashboard(
                 win_probability=win_probability,
                 target_config_results=target_config_results,
             )
-            figure_html = figure.to_html(include_plotlyjs="cdn", full_html=False)
+            figure_html = figure.to_html(
+                include_plotlyjs="cdn",
+                full_html=False,
+                config={"responsive": True, "displaylogo": False},
+                default_width="100%",
+            )
         except (TypeError, ValueError) as exc:
             error = str(exc)
 
